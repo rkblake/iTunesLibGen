@@ -11,7 +11,5 @@ plist.attrib = {'version': '1.0'}
 plist.text = '\n'
 
 print ET.tostring(plist)
-
+library.write(ET.tostring(plist))
 library.close()
-tree = ET.ElementTree(plist)
-tree.write("iTunes Music Library.xml")
