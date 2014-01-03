@@ -3,7 +3,7 @@ import sys
 import xml.etree.ElementTree as ET
 from mutagen.mp3 import MP3
 
-int = 0
+i = 0
 
 def add_key(dst, name, data_type, value):
     new = ET.SubElement(dst, "key")
@@ -14,36 +14,36 @@ def add_key(dst, name, data_type, value):
             new.text = str(value)
 
 def add_song(dst, path):
-    add_key(dst, int, None, None)
+    add_key(dst, i, None, None)
     fdict = ET.SubElement(dst, 'dict')
-    file = MP3(path)
-    add_key(fdict, "Track ID", "integer", int)
-    add_key(fdict, "Name", "string", file["TIT2"])
-    add_key(fdict, "Artist", "string", file["TPE1"])
-    add_key(fdict, "Album Artist", "string", file["TPE2"])
-    add_key(fdict, "Composer", "string", file["TCOM"])
-    add_key(fdict, "Album", "string", file["TALB"])
-    add_key(fdict, "Genre", "string", file["TCON"])
-    add_key(fdict, "Kind", "string", file["TFLT"])
+    f = MP3(path)
+    add_key(fdict, "Track ID", "integer", i)
+    add_key(fdict, "Name", "string", f["TIT2"])
+    add_key(fdict, "Artist", "string", f["TPE1"])
+    add_key(fdict, "Album Artist", "string", f["TPE2"])
+    add_key(fdict, "Composer", "string", f["TCOM"])
+    add_key(fdict, "Album", "string", f["TALB"])
+    add_key(fdict, "Genre", "string", f["TCON"])
+    add_key(fdict, "Kind", "string", f["TFLT"])
     add_key(fdict, "Size", "integer", None)                 #TODO: this
-    add_key(fdict, "Total Time", "integer", file["TLEN"])
-    add_key(fdict, "Disc Number", "integer", file["TPOS"])
-    add_key(fdict, "Disc Count", "integer", file["TPOS"])
-    add_key(fdict, "Track Number", "integer", file["TRCK"])
-    add_key(fdict, "Track Count", "integer", file["TRCK"])
-    add_key(fdict, "Year", "integer", file["TDRC"])
+    add_key(fdict, "Total Time", "integer", f["TLEN"])
+    add_key(fdict, "Disc Number", "integer", f["TPOS"])
+    add_key(fdict, "Disc Count", "integer", f["TPOS"])
+    add_key(fdict, "Track Number", "integer", f["TRCK"])
+    add_key(fdict, "Track Count", "integer", f["TRCK"])
+    add_key(fdict, "Year", "integer", f["TDRC"])
     add_key(fdict, "Date Modified", "date", None)           #TODO: this
     add_key(fdict, "Date Added", "date", None)              #TODO: this
     add_key(fdict, "Bit Rate", "integer", None)             #TODO: this
     add_key(fdict, "Sample Rate", "integer", None)          #TODO: this
-    add_key(fdcit, "Comments", "string", file["COMM"])
+    add_key(fdcit, "Comments", "string", f["COMM"])
     add_key(fdict, "Artwork Count", "integer", None)        #TODO: this
     add_key(fdict, "Persistent ID", "string", None)         #TODO: this
     add_key(fdict, "Track Type", "string", "File")
-    add_key(fdict, "Location", "string", None)              #TODO: this!!!
+    add_key(fdict, "Location", "string", path)
     add_key(fdict, "File Folder Count", "integer", -1)
     add_key(fdict, "Library Folder Count", "integer", -1)
-    int += 2
+    i += 2
 
 #path = sys.argv[1]
 library = open('iTunes Music Library.xml', 'w')
