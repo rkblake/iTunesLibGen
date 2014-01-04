@@ -1,5 +1,6 @@
 import sys
 import os
+import random
 import xml.etree.ElementTree as ET
 from mutagen.mp3 import MP3
 from datetime import datetime
@@ -13,7 +14,7 @@ def add_key(dst, name, data_type, value):
         if value:
             new.text = str(value)
 
-def add_song(dst, path):
+def add_song(dst, path , i):
     add_key(dst, i, None, None)
     fdict = ET.SubElement(dst, 'dict')
     audio = MP3(path)
@@ -38,7 +39,7 @@ def add_song(dst, path):
     add_key(fdict, "Sample Rate", "integer", audio.info.sample_rate)
     add_key(fdict, "Comments", "string", audio["COMM"])
     add_key(fdict, "Artwork Count", "integer", None)        #TODO: this
-    add_key(fdict, "Persistent ID", "string", None)         #TODO: this
+    add_key(fdict, "Persistent ID", "string", gen_id())         #TODO: this
     add_key(fdict, "Track Type", "string", "File")
     add_key(fdict, "Location", "string", format_path(path))
     add_key(fdict, "File Folder Count", "integer", 4)
@@ -75,6 +76,13 @@ def get_date():
                      datetime.now().minute,
                      datetime.now().second).isoformat()+"Z")
 
+def gen_id():
+    id = ''
+    it = 0
+    while it != 7:
+        id += random.choice('123456789ABCDEF')
+        ++it
+
 if __name__ == "__main__":
     i = 0
     path = sys.argv[1]
@@ -95,7 +103,7 @@ if __name__ == "__main__":
     add_key(mdict, "Features", "integer", 5)
     add_key(mdict, "Show Content Ratings", "true", None)
     add_key(mdict, "Music Folder", "path", format_path(path))
-    add_key(mdict, "Library Persistent ID", "string", "0123456789abcdef")   #TODO: this?
+    add_key(mdict, "Library Persistent ID", "string", gen_id())
     add_key(mdict, "Tracks", None, None)
     sdict = ET.SubElement(mdict, 'dict')
     sdict.text = '\n\t\t'
