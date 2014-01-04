@@ -29,8 +29,8 @@ def add_song(dst, path):
     add_key(fdict, "Total Time", "integer", audio["TLEN"])
     add_key(fdict, "Disc Number", "integer", split_trackdisc(audio["TPOS"]), True))
     add_key(fdict, "Disc Count", "integer", split_trackdisc(audio["TPOS"]), False))
-    add_key(fdict, "Track Number", "integer", split_trackdisc(audio["TRCK:"], True))
-    add_key(fdict, "Track Count", "integer", split_trackdisc(audio["TRCK:"], False))
+    add_key(fdict, "Track Number", "integer", split_trackdisc(audio["TRCK"], True))
+    add_key(fdict, "Track Count", "integer", split_trackdisc(audio["TRCK"], False))
     add_key(fdict, "Year", "integer", audio["TDRC"])
     add_key(fdict, "Date Modified", "date", None)           #TODO: this
     add_key(fdict, "Date Added", "date", None)              #TODO: this
