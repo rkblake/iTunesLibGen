@@ -64,7 +64,7 @@ def split_trackdisc(frame, first):
 
 def get_filesize(path):
     if sys.platform == 'win32':
-        return os.path.getsize(path.replace("\\","\\\\")
+        return os.path.getsize(path.replace("\\","\\\\"))
     else:
         return os.path.getsize(path)
 
@@ -74,7 +74,7 @@ def get_date():
                      datetime.now().day,
                      datetime.now().hour,
                      datetime.now().minute,
-                     datetime.now().second).isoformat()+"Z")
+                     datetime.now().second).isoformat()+"Z"
 
 def gen_id():
     id = ''
