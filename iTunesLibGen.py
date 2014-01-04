@@ -1,6 +1,7 @@
 import sys
 import os
 import random
+import re
 import xml.etree.ElementTree as ET
 from mutagen.mp3 import MP3
 from datetime import datetime
@@ -8,59 +9,106 @@ from math import trunc
 
 def add_key(dst, name, data_type, value):
     new = ET.SubElement(dst, "key")
-    new.text = name+'\n\t\t'
+    new.text = str(name)+'\n\t\t'
     if data_type:
         new = ET.SubElement(dst, data_type)
         if value:
             new.text = str(value)
 
-def add_song(dst, path , i):
-    add_key(dst, i, None, None)
+def add_song(dst, path , track_id):
+    add_key(dst, track_id, None, None)
     fdict = ET.SubElement(dst, 'dict')
     audio = MP3(path)
-    add_key(fdict, "Track ID", "integer", i)
-    add_key(fdict, "Name", "string", audio["TIT2"])
-    add_key(fdict, "Artist", "string", audio["TPE1"])
-    add_key(fdict, "Album Artist", "string", audio["TPE2"])
-    add_key(fdict, "Composer", "string", audio["TCOM"])
-    add_key(fdict, "Album", "string", audio["TALB"])
-    add_key(fdict, "Genre", "string", audio["TCON"])
-    add_key(fdict, "Kind", "string", audio["TFLT"])
+    add_key(fdict, "Track ID", "integer", track_id)
+    try:
+        add_key(fdict, "Name", "string", audio["TIT2"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Artist", "string", audio["TPE1"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Album Artist", "string", audio["TPE2"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Composer", "string", audio["TCOM"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Album", "string", audio["TALB"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Genre", "string", audio["TCON"])
+    except KeyError:
+        pass
+    add_key(fdict, "Kind", "string", "MPEG audio file")
     add_key(fdict, "Size", "integer", get_filesize(path))
     add_key(fdict, "Total Time", "integer", trunc(audio.info.length * 1000))
-    add_key(fdict, "Disc Number", "integer", split_trackdisc(audio["TPOS"], True))
-    add_key(fdict, "Disc Count", "integer", split_trackdisc(audio["TPOS"], False))
+    try:
+        add_key(fdict, "Disc Number", "integer", split_trackdisc(audio["TPOS"], True))
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Disc Count", "integer", split_trackdisc(audio["TPOS"], False))
+    except KeyError:
+        pass
     add_key(fdict, "Track Number", "integer", split_trackdisc(audio["TRCK"], True))
     add_key(fdict, "Track Count", "integer", split_trackdisc(audio["TRCK"], False))
-    add_key(fdict, "Year", "integer", audio["TYER"])
+    add_key(fdict, "Year", "integer", audio["TDRC"])
     add_key(fdict, "Date Modified", "date", get_date())
     add_key(fdict, "Date Added", "date", get_date())
     add_key(fdict, "Bit Rate", "integer", audio.info.bitrate / 1000)
     add_key(fdict, "Sample Rate", "integer", audio.info.sample_rate)
-    add_key(fdict, "Comments", "string", audio["COMM"])
+    try:
+        add_key(fdict, "Comments", "string", audio["COMM"])
+    except KeyError:
+        pass
     add_key(fdict, "Artwork Count", "integer", None)        #TODO: this
-    add_key(fdict, "Persistent ID", "string", gen_id())         #TODO: this
+    try:
+        add_key(fdict, "Sort Album", "string", audio["TSOA"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Sort Album Artist", "string", audio["TSO2"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Sort Artist", "string", audio["TSOP"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Sort Composer", "string", audio["TSOC"])
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Sort Name", "string", audio["TSOT"])
+    except KeyError:
+        pass
+    add_key(fdict, "Persistent ID", "string", gen_id())
     add_key(fdict, "Track Type", "string", "File")
     add_key(fdict, "Location", "string", format_path(path))
-    add_key(fdict, "File Folder Count", "integer", 4)
-    add_key(fdict, "Library Folder Count", "integer", 1)
-    i += 2
+    add_key(fdict, "File Folder Count", "integer", 4)       #TODO: this
+    add_key(fdict, "Library Folder Count", "integer", 1)    #TODO: this
 
 def format_path(path):
+    formatted_path = ''
     if sys.platform == 'win32':
-        str = 'file://localhost/' + str
-        str = str.replace('\\','/')
+        formatted_path = 'file://localhost/' + formatted_path
+        formatted_path = formatted_path.replace('\\','/')
     else:
-        str = 'file://localhost' + str
-    str = str.replace(' ','%20')
-    return str
+        formatted_path = 'file://localhost' + formatted_path
+    formatted_path = formatted_path.replace(' ','%20')
+    return formatted_path
 
 def split_trackdisc(frame, first):
-    index = str.find('/')
+    index = str(frame).find('/')
     if first:
-        return str[:index]
+        return frame[:index]
     else:
-        return str[-index:]
+        return frame[-index:]
 
 def get_filesize(path):
     if sys.platform == 'win32':
@@ -77,15 +125,10 @@ def get_date():
                      datetime.now().second).isoformat()+"Z"
 
 def gen_id():
-    id = ''
-    it = 0
-    while it != 16:
-        id += random.choice('123456789ABCDEF')
-        it += 1
-    return id
+    return ''.join([random.choice('123456789ABCDEF') for i in xrange(16)])
 
 if __name__ == "__main__":
-    i = 0
+    track_id = 0
     path = sys.argv[1]
     library = open('iTunes Music Library.xml', 'w')
     library.write('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -108,6 +151,12 @@ if __name__ == "__main__":
     add_key(mdict, "Tracks", None, None)
     sdict = ET.SubElement(mdict, 'dict')
     sdict.text = '\n\t\t'
+    for folder in os.walk(path):
+        for filename in folder[2]:
+            if re.search('.mp3', filename, re.IGNORECASE):
+                print(folder[0]+filename)
+                add_song(sdict, folder[0]+filename, track_id)
+                track_id += 2
 
     library.write(ET.tostring(plist))
     library.close()
