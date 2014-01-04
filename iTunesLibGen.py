@@ -25,7 +25,7 @@ def add_song(dst, path):
     add_key(fdict, "Album", "string", audio["TALB"])
     add_key(fdict, "Genre", "string", audio["TCON"])
     add_key(fdict, "Kind", "string", audio["TFLT"])
-    add_key(fdict, "Size", "integer", )
+    add_key(fdict, "Size", "integer", get_filesize(path))
     add_key(fdict, "Total Time", "integer", audio["TLEN"])
     add_key(fdict, "Disc Number", "integer", split_trackdisc(audio["TPOS"]), True))
     add_key(fdict, "Disc Count", "integer", split_trackdisc(audio["TPOS"]), False))
