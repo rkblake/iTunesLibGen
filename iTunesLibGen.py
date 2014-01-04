@@ -79,9 +79,10 @@ def get_date():
 def gen_id():
     id = ''
     it = 0
-    while it != 7:
+    while it != 16:
         id += random.choice('123456789ABCDEF')
-        ++it
+        it += 1
+    return id
 
 if __name__ == "__main__":
     i = 0
