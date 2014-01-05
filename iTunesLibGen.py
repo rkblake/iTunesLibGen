@@ -15,92 +15,51 @@ def add_key(dst, name, data_type, value):
         if value:
             new.text = str(value)
 
+def add_tag(dst, name, data_type, value):
+    if value == None:
+        return
+    else:
+        new = ET.SubElement(dst, "key")
+        new.text = str(name)+'\n\t\t'
+        if data_type:
+            if value:
+                new.text = str(value)
+
 def add_song(dst, path , track_id):
     add_key(dst, track_id, None, None)
     fdict = ET.SubElement(dst, 'dict')
     audio = MP3(path)
-    add_key(fdict, "Track ID", "integer", track_id)
-    try:
-        add_key(fdict, "Name", "string", audio["TIT2"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Artist", "string", audio["TPE1"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Album Artist", "string", audio["TPE2"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Composer", "string", audio["TCOM"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Album", "string", audio["TALB"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Genre", "string", audio["TCON"])
-    except KeyError:
-        pass
-    add_key(fdict, "Kind", "string", "MPEG audio file")
-    add_key(fdict, "Size", "integer", get_filesize(path))
-    add_key(fdict, "Total Time", "integer", trunc(audio.info.length * 1000))
-    try:
-        add_key(fdict, "Disc Number", "integer", split_trackdisc(audio["TPOS"], True))
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Disc Count", "integer", split_trackdisc(audio["TPOS"], False))
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Track Number", "integer", split_trackdisc(audio["TRCK"], True))
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Track Count", "integer", split_trackdisc(audio["TRCK"], False))
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Year", "integer", audio["TDRC"])
-    except KeyError:
-        pass
-    add_key(fdict, "Date Modified", "date", get_date())
-    add_key(fdict, "Date Added", "date", get_date())
-    add_key(fdict, "Bit Rate", "integer", audio.info.bitrate / 1000)
-    add_key(fdict, "Sample Rate", "integer", audio.info.sample_rate)
-    try:
-        add_key(fdict, "Comments", "string", audio["COMM"])
-    except KeyError:
-        pass
-    add_key(fdict, "Artwork Count", "integer", None)        #TODO: this
-    try:
-        add_key(fdict, "Sort Album", "string", audio["TSOA"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Sort Album Artist", "string", audio["TSO2"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Sort Artist", "string", audio["TSOP"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Sort Composer", "string", audio["TSOC"])
-    except KeyError:
-        pass
-    try:
-        add_key(fdict, "Sort Name", "string", audio["TSOT"])
-    except KeyError:
-        pass
-    add_key(fdict, "Persistent ID", "string", gen_id())
-    add_key(fdict, "Track Type", "string", "File")
-    add_key(fdict, "Location", "string", format_path(path))
-    add_key(fdict, "File Folder Count", "integer", 4)       #TODO: this
-    add_key(fdict, "Library Folder Count", "integer", 1)    #TODO: this
+    add_tag(fdict, "Track ID", "integer", track_id)
+    add_tag(fdict, "Name", "string", audio.get("TIT2", None))
+    add_tag(fdict, "Artist", "string", audio.get("TPE1", None))
+    add_tag(fdict, "Album Artist", "string", audio.get("TPE2", None))
+    add_tag(fdict, "Composer", "string", audio.get("TCOM", None))
+    add_tag(fdict, "Album", "string", audio.get("TALB", None))
+    add_tag(fdict, "Genre", "string", audio.get("TCON", None))
+    add_tag(fdict, "Kind", "string", "MPEG audio file")
+    add_tag(fdict, "Size", "integer", get_filesize(path))
+    add_tag(fdict, "Total Time", "integer", trunc(audio.info.length * 1000))
+    add_tag(fdict, "Disc Number", "integer", split_trackdisc(audio.get("TPOS", None), True))
+    add_tag(fdict, "Disc Count", "integer", split_trackdisc(audio.get("TPOS", None), False))
+    add_tag(fdict, "Track Number", "integer", split_trackdisc(audio.get("TRCK", None), True))
+    add_tag(fdict, "Track Count", "integer", split_trackdisc(audio.get("TRCK", None), False))
+    add_tag(fdict, "Year", "integer", audio.get("TDRC", None))
+    add_tag(fdict, "Date Modified", "date", get_date())
+    add_tag(fdict, "Date Added", "date", get_date())
+    add_tag(fdict, "Bit Rate", "integer", audio.info.bitrate / 1000)
+    add_tag(fdict, "Sample Rate", "integer", audio.info.sample_rate)
+    add_tag(fdict, "Comments", "string", audio.get("COMM", None))
+    add_tag(fdict, "Artwork Count", "integer", None)        #TODO: this
+    add_tag(fdict, "Sort Album", "string", audio.get("TSOA", None))
+    add_tag(fdict, "Sort Album Artist", "string", audio.get("TSO2", None))
+    add_tag(fdict, "Sort Artist", "string", audio.get("TSOP", None))
+    add_tag(fdict, "Sort Composer", "string", audio.get("TSOC", None))
+    add_tag(fdict, "Sort Name", "string", audio.get("TSOT", None))
+    add_tag(fdict, "Persistent ID", "string", gen_id())
+    add_tag(fdict, "Track Type", "string", "File")
+    add_tag(fdict, "Location", "string", format_path(path))
+    add_tag(fdict, "File Folder Count", "integer", 4)       #TODO: this
+    add_tag(fdict, "Library Folder Count", "integer", 1)    #TODO: this
 
 def format_path(path):
     formatted_path = ''
