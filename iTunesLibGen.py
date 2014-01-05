@@ -55,9 +55,18 @@ def add_song(dst, path , track_id):
         add_key(fdict, "Disc Count", "integer", split_trackdisc(audio["TPOS"], False))
     except KeyError:
         pass
-    add_key(fdict, "Track Number", "integer", split_trackdisc(audio["TRCK"], True))
-    add_key(fdict, "Track Count", "integer", split_trackdisc(audio["TRCK"], False))
-    add_key(fdict, "Year", "integer", audio["TDRC"])
+    try:
+        add_key(fdict, "Track Number", "integer", split_trackdisc(audio["TRCK"], True))
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Track Count", "integer", split_trackdisc(audio["TRCK"], False))
+    except KeyError:
+        pass
+    try:
+        add_key(fdict, "Year", "integer", audio["TDRC"])
+    except KeyError:
+        pass
     add_key(fdict, "Date Modified", "date", get_date())
     add_key(fdict, "Date Added", "date", get_date())
     add_key(fdict, "Bit Rate", "integer", audio.info.bitrate / 1000)
@@ -96,19 +105,19 @@ def add_song(dst, path , track_id):
 def format_path(path):
     formatted_path = ''
     if sys.platform == 'win32':
-        formatted_path = 'file://localhost/' + formatted_path
+        formatted_path = 'file://localhost/' + path
         formatted_path = formatted_path.replace('\\','/')
     else:
-        formatted_path = 'file://localhost' + formatted_path
+        formatted_path = 'file://localhost' + path
     formatted_path = formatted_path.replace(' ','%20')
     return formatted_path
 
 def split_trackdisc(frame, first):
     index = str(frame).find('/')
     if first:
-        return frame[:index]
+        return str(frame)[:index]
     else:
-        return frame[-index:]
+        return str(frame)[-index:]
 
 def get_filesize(path):
     if sys.platform == 'win32':
