@@ -65,7 +65,6 @@ def format_path(path):
     formatted_path = ''
     if sys.platform == 'win32':
         formatted_path = 'file://localhost/' + path
-        formatted_path = formatted_path.replace('\\','/')
     else:
         formatted_path = 'file://localhost' + path
     formatted_path = formatted_path.replace(' ','%20')
@@ -79,10 +78,7 @@ def split_trackdisc(frame, first):
         return str(frame)[-index:]
 
 def get_filesize(path):
-    if sys.platform == 'win32':
-        return os.path.getsize(path.replace("\\","\\\\"))
-    else:
-        return os.path.getsize(path)
+        return str(os.path.getsize(path))
 
 def get_date():
     return datetime(datetime.now().year,
@@ -98,6 +94,10 @@ def gen_id():
 if __name__ == "__main__":
     track_id = 0
     path = sys.argv[1]
+    if sys.platform == 'win32':
+        path.replace('\\','/')
+    if !path.endswith('/'):
+        path += '/'
     library = open('iTunes Music Library.xml', 'w')
     library.write('<?xml version="1.0" encoding="UTF-8"?>\n'
                   '<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" '
