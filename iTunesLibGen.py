@@ -65,6 +65,7 @@ def format_path(path):
     formatted_path = ''
     if sys.platform == 'win32':
         formatted_path = 'file://localhost/' + path
+        formatted_path = formatted_path.replace('\\','/')
     else:
         formatted_path = 'file://localhost' + path
     formatted_path = formatted_path.replace(' ','%20')
@@ -93,9 +94,7 @@ def gen_id():
 
 if __name__ == "__main__":
     track_id = 0
-    path = sys.argv[1]
-    if sys.platform == 'win32':
-        path.replace('\\','/')
+    path = os.path.abspath(sys.argv[1])
     if !path.endswith('/'):
         path += '/'
     library = open('iTunes Music Library.xml', 'w')
